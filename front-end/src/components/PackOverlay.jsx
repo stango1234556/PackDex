@@ -40,9 +40,7 @@ export default function PackOverlay({
                   className={`flip-card-inner ${isFlipped ? "flipped" : ""}`}
                 >
                   <div className="flip-card-face flip-card-back">
-                    <div className="card-back-design">
-                      <span>Pokémon</span>
-                    </div>
+                    <img src="/card-back.webp" alt="Card back" className="card-back-image" />
                   </div>
 
                   <div className="flip-card-face flip-card-front">

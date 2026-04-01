@@ -1,19 +1,19 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { SETS } from "./data/sets";
+import { loadSimulatorSet } from "./api/loadSimulatorSet";
 import PackOverlay from "./components/PackOverlay";
 import CollectionGrid from "./components/CollectionGrid";
 import "./styles.css";
 
 const rarityWeights = {
-  Common: 55,
-  Uncommon: 28,
-  Rare: 13,
-  "Ultra Rare": 4,
+  Common: 60,
+  Uncommon: 25,
+  Rare: 10,
+  "Ultra Rare": 5,
 };
 
-const ENTER_DELAY_MS = 250;
-const FLIP_DELAY_MS = 225;
-const PAUSE_BEFORE_FLIP_MS = 400;
+const ENTER_DELAY_MS = 100;
+const FLIP_DELAY_MS = 175;
+const PAUSE_BEFORE_FLIP_MS = 300;
 
 function weightedRandom(cards) {
   const expanded = cards.map((card) => ({
@@ -54,27 +54,55 @@ function openPack(setData) {
 }
 
 export default function App() {
-  const [selectedSetId, setSelectedSetId] = useState(SETS[0].id);
+  const [sets, setSets] = useState([]);
+  const [isLoadingSets, setIsLoadingSets] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [selectedSetId, setSelectedSetId] = useState("");
+
   const [lastPack, setLastPack] = useState([]);
   const [pendingPack, setPendingPack] = useState([]);
-  const [allCollections, setAllCollections] = useState(() => {
-    const startingCollections = {};
-    for (const set of SETS) {
-      startingCollections[set.id] = {};
-    }
-    return startingCollections;
-  });
+  const [allCollections, setAllCollections] = useState({});
   const [enteredCount, setEnteredCount] = useState(0);
   const [revealedCount, setRevealedCount] = useState(0);
   const [isOpeningPack, setIsOpeningPack] = useState(false);
+
   const animationTimeoutRef = useRef([]);
 
-  const collection = allCollections[selectedSetId] || {};
+  useEffect(() => {
+    async function fetchSets() {
+      try {
+        setIsLoadingSets(true);
+        setLoadError("");
 
-  const selectedSet = useMemo(
-    () => SETS.find((setItem) => setItem.id === selectedSetId) ?? SETS[0],
-    [selectedSetId]
-  );
+        const englishSet = await loadSimulatorSet("swsh3", "en");
+        setSets([englishSet]);
+        setSelectedSetId(englishSet.id);
+      } catch (error) {
+        console.error("Set loading failed:", error);
+        setLoadError(error.message || "Failed to load card sets.");
+      } finally {
+        setIsLoadingSets(false);
+      }
+    }
+
+    fetchSets();
+  }, []);
+
+  useEffect(() => {
+    if (sets.length === 0) return;
+
+    setAllCollections((prev) => {
+      const next = { ...prev };
+
+      for (const set of sets) {
+        if (!next[set.id]) {
+          next[set.id] = {};
+        }
+      }
+
+      return next;
+    });
+  }, [sets]);
 
   useEffect(() => {
     return () => {
@@ -89,7 +117,16 @@ export default function App() {
     animationTimeoutRef.current = [];
   }
 
+  const selectedSet = useMemo(
+    () => sets.find((setItem) => setItem.id === selectedSetId) ?? null,
+    [sets, selectedSetId]
+  );
+
+  const collection = selectedSetId ? allCollections[selectedSetId] || {} : {};
+
   function handleOpenPack() {
+    if (!selectedSet) return;
+
     clearAnimationTimeouts();
 
     const pack = openPack(selectedSet);
@@ -121,7 +158,7 @@ export default function App() {
   function handleCloseOverlay() {
     clearAnimationTimeouts();
 
-    if (pendingPack.length > 0) {
+    if (pendingPack.length > 0 && selectedSetId) {
       setAllCollections((prev) => {
         const next = { ...prev };
         const currentSetCollection = { ...(next[selectedSetId] || {}) };
@@ -144,16 +181,56 @@ export default function App() {
   }
 
   function handleResetCollection() {
+    if (!selectedSetId) return;
+
     clearAnimationTimeouts();
+
     setAllCollections((prev) => ({
       ...prev,
       [selectedSetId]: {},
     }));
+
     setPendingPack([]);
     setLastPack([]);
     setEnteredCount(0);
     setRevealedCount(0);
     setIsOpeningPack(false);
+  }
+
+  if (isLoadingSets) {
+    return (
+      <div className="app">
+        <div className="layout">
+          <section className="content">
+            <p>Loading sets...</p>
+          </section>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="app">
+        <div className="layout">
+          <section className="content">
+            <p>{loadError}</p>
+          </section>
+        </div>
+      </div>
+    );
+  }
+
+  if (!selectedSet) {
+    return (
+      <div className="app">
+        <div className="layout">
+          <section className="content">
+            <p>No set selected.</p>
+          </section>
+        </div>
+      </div>
+    );
   }
 
   const uniqueCollected = Object.values(collection).filter(
@@ -179,7 +256,7 @@ export default function App() {
               setIsOpeningPack(false);
             }}
           >
-            {SETS.map((setItem) => (
+            {sets.map((setItem) => (
               <option key={setItem.id} value={setItem.id}>
                 {setItem.language} - {setItem.name}
               </option>
