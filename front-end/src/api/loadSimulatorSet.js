@@ -20,6 +20,22 @@ function normalizeRarity(rarity) {
   return "Common";
 }
 
+function getPackLayoutForSet(setId) {
+  if (setId === "swsh3") {
+    return {
+      Common: 5,
+      Uncommon: 3,
+      Rare: 2,
+    };
+  }
+
+  return {
+    Common: 5,
+    Uncommon: 3,
+    Rare: 2,
+  };
+}
+
 export async function loadSimulatorSet(setId, language = "en") {
   const client = language === "ja" ? tcgdexJp : tcgdexEn;
 
@@ -59,7 +75,11 @@ export async function loadSimulatorSet(setId, language = "en") {
     id: apiSet.id,
     language: language === "ja" ? "Japanese" : "English",
     name: apiSet.name,
-    packSize: 10,
+    packSize:
+      getPackLayoutForSet(apiSet.id).Common +
+      getPackLayoutForSet(apiSet.id).Uncommon +
+      getPackLayoutForSet(apiSet.id).Rare,
+    packLayout: getPackLayoutForSet(apiSet.id),
     cards: fullCards,
   };
 }

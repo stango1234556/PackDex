@@ -10,6 +10,19 @@ export default function PackOverlay({
     return null;
   }
 
+  const commons = lastPack.filter((card) => card.rarity === "Common");
+  const uncommons = lastPack.filter((card) => card.rarity === "Uncommon");
+  const rares = lastPack.filter(
+    (card) => card.rarity === "Rare" || card.rarity === "Ultra Rare"
+  );
+
+  const displayRows = [rares, uncommons, commons];
+
+  const animationIndexById = {};
+  lastPack.forEach((card, index) => {
+    animationIndexById[card.id] = index;
+  });
+
   return (
     <div className="pack-overlay" onClick={handleCloseOverlay}>
       <div
@@ -26,30 +39,39 @@ export default function PackOverlay({
           </button>
         </div>
 
-        <div className="overlay-pack-grid">
-          {lastPack.map((card, index) => {
-            const hasEntered = index < enteredCount;
-            const isFlipped = index < revealedCount;
+        <div className="overlay-pack-rows">
+          {displayRows.map((row, rowIndex) => (
+            <div key={rowIndex} className="overlay-pack-row">
+              {row.map((card, cardIndex) => {
+                const animationIndex = animationIndexById[card.id];
+                const hasEntered = animationIndex < enteredCount;
+                const isFlipped = animationIndex < revealedCount;
 
-            return (
-              <div
-                key={`overlay-${card.id}-${index}`}
-                className={`flip-card-shell ${hasEntered ? "card-entered" : ""}`}
-              >
-                <div
-                  className={`flip-card-inner ${isFlipped ? "flipped" : ""}`}
-                >
-                  <div className="flip-card-face flip-card-back">
-                    <img src="/card-back.webp" alt="Card back" className="card-back-image" />
-                  </div>
+                return (
+                  <div
+                    key={`overlay-${card.id}-${cardIndex}`}
+                    className={`flip-card-shell ${hasEntered ? "card-entered" : ""}`}
+                  >
+                    <div
+                      className={`flip-card-inner ${isFlipped ? "flipped" : ""}`}
+                    >
+                      <div className="flip-card-face flip-card-back">
+                        <img
+                          src="/card-back.webp"
+                          alt="Card back"
+                          className="card-back-image"
+                        />
+                      </div>
 
-                  <div className="flip-card-face flip-card-front">
-                    <img src={card.image} alt={card.name} />
+                      <div className="flip-card-face flip-card-front">
+                        <img src={card.image} alt={card.name} />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
     </div>

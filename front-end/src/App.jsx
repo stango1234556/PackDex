@@ -4,53 +4,49 @@ import PackOverlay from "./components/PackOverlay";
 import CollectionGrid from "./components/CollectionGrid";
 import "./styles.css";
 
-const rarityWeights = {
-  Common: 60,
-  Uncommon: 25,
-  Rare: 10,
-  "Ultra Rare": 5,
-};
-
 const ENTER_DELAY_MS = 100;
-const FLIP_DELAY_MS = 175;
+const FLIP_DELAY_MS = 225;
 const PAUSE_BEFORE_FLIP_MS = 300;
 
-function weightedRandom(cards) {
-  const expanded = cards.map((card) => ({
-    ...card,
-    weight: rarityWeights[card.rarity] ?? 1,
-  }));
+function getPackLayout(setData) {
+  return (
+    setData.packLayout || {
+      Common: 5,
+      Uncommon: 3,
+      Rare: 2,
+    }
+  );
+}
 
-  const total = expanded.reduce((sum, card) => sum + card.weight, 0);
-  let roll = Math.random() * total;
+function getRandomUniqueCards(cards, count) {
+  const availableCards = [...cards];
+  const pulled = [];
+  const cardsToPull = Math.min(count, availableCards.length);
 
-  for (const card of expanded) {
-    roll -= card.weight;
-    if (roll <= 0) return card;
+  for (let i = 0; i < cardsToPull; i++) {
+    const randomIndex = Math.floor(Math.random() * availableCards.length);
+    const chosenCard = availableCards[randomIndex];
+    pulled.push(chosenCard);
+    availableCards.splice(randomIndex, 1);
   }
 
-  return expanded[expanded.length - 1];
+  return pulled;
 }
 
 function openPack(setData) {
-  const availableCards = [...setData.cards];
-  const pack = [];
-  const cardsToPull = Math.min(setData.packSize, availableCards.length);
+  const layout = getPackLayout(setData);
 
-  for (let i = 0; i < cardsToPull; i++) {
-    const pulledCard = weightedRandom(availableCards);
-    pack.push(pulledCard);
+  const commons = setData.cards.filter((card) => card.rarity === "Common");
+  const uncommons = setData.cards.filter((card) => card.rarity === "Uncommon");
+  const rares = setData.cards.filter(
+    (card) => card.rarity === "Rare" || card.rarity === "Ultra Rare"
+  );
 
-    const removeIndex = availableCards.findIndex(
-      (card) => card.id === pulledCard.id
-    );
+  const pulledCommons = getRandomUniqueCards(commons, layout.Common || 0);
+  const pulledUncommons = getRandomUniqueCards(uncommons, layout.Uncommon || 0);
+  const pulledRares = getRandomUniqueCards(rares, layout.Rare || 0);
 
-    if (removeIndex !== -1) {
-      availableCards.splice(removeIndex, 1);
-    }
-  }
-
-  return pack;
+  return [...pulledCommons, ...pulledUncommons, ...pulledRares];
 }
 
 export default function App() {
@@ -75,8 +71,10 @@ export default function App() {
         setLoadError("");
 
         const englishSet = await loadSimulatorSet("swsh3", "en");
-        setSets([englishSet]);
-        setSelectedSetId(englishSet.id);
+
+        const loadedSets = [englishSet];
+        setSets(loadedSets);
+        setSelectedSetId(loadedSets[0].id);
       } catch (error) {
         console.error("Set loading failed:", error);
         setLoadError(error.message || "Failed to load card sets.");
