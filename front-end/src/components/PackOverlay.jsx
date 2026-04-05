@@ -1,3 +1,5 @@
+import { getFinishClass, hasSpecialFinish } from "../data/cardDisplay";
+
 export default function PackOverlay({
   isOpeningPack,
   lastPack,
@@ -10,13 +12,11 @@ export default function PackOverlay({
     return null;
   }
 
-  const commons = lastPack.filter((card) => card.rarity === "Common");
-  const uncommons = lastPack.filter((card) => card.rarity === "Uncommon");
-  const rares = lastPack.filter(
-    (card) => card.rarity === "Rare" || card.rarity === "Ultra Rare"
-  );
+  const commonRow = lastPack.slice(0, 5);
+  const uncommonRow = lastPack.slice(5, 8);
+  const rareRow = lastPack.slice(8, 10);
 
-  const displayRows = [rares, uncommons, commons];
+  const displayRows = [rareRow, uncommonRow, commonRow];
 
   const animationIndexById = {};
   lastPack.forEach((card, index) => {
@@ -46,6 +46,8 @@ export default function PackOverlay({
                 const animationIndex = animationIndexById[card.id];
                 const hasEntered = animationIndex < enteredCount;
                 const isFlipped = animationIndex < revealedCount;
+                const finishClass = getFinishClass(card);
+                const isShiny = hasSpecialFinish(card);
 
                 return (
                   <div
@@ -63,8 +65,16 @@ export default function PackOverlay({
                         />
                       </div>
 
-                      <div className="flip-card-face flip-card-front">
+                      <div
+                        className={`flip-card-face flip-card-front ${finishClass}`}
+                      >
                         <img src={card.image} alt={card.name} />
+                        {isShiny && (
+                          <>
+                            <div className="iridescent-shine" />
+                            <div className="card-gloss" />
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>

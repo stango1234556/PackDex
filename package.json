@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@tcgdex/sdk": "^2.7.1"
+    "@tcgdex/sdk": "^2.7.1",
+    "react-router-dom": "^7.14.0"
   }
 }
