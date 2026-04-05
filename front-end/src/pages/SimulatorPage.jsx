@@ -63,6 +63,51 @@ const ERA_PACK_RULES = {
   },
 };
 
+const MANUAL_SET_LOGOS_BY_NAME = {
+  "Dragon Majesty": "/set-logos/dragon-majesty.png",
+  "Temporal Forces": "/set-logos/temporal-forces.png",
+  "Shining Legends": "/set-logos/shining-legends.png",
+};
+
+const SET_THEME_BY_NAME = {
+  "Temporal Forces": {
+    background: "linear-gradient(135deg, #5f6b2d 0%, #9c4c1f 50%, #3a2218 100%)",
+  },
+  "Shining Legends": {
+    background: "linear-gradient(135deg, #2e2f5d 0%, #4b2d6b 45%, #a87d1f 100%)",
+  },
+  "Dragon Majesty": {
+    background: "linear-gradient(135deg, #4a0d0d 0%, #7a1f1f 45%, #d78b20 100%)",
+  },
+};
+
+function getSetLogoSrc(setInfo) {
+  if (MANUAL_SET_LOGOS_BY_NAME[setInfo.name]) {
+    return MANUAL_SET_LOGOS_BY_NAME[setInfo.name];
+  }
+
+  if (setInfo.logo) {
+    return `${setInfo.logo}.png`;
+  }
+
+  return null;
+}
+
+function getSetHeroStyle(setInfo) {
+  if (SET_THEME_BY_NAME[setInfo.name]) {
+    return SET_THEME_BY_NAME[setInfo.name];
+  }
+
+  return {
+    background: "linear-gradient(135deg, #1f2730 0%, #2d2d2d 45%, #171717 100%)",
+  };
+}
+
+function getSetTcgplayerSearchUrl(setInfo) {
+  const query = `${setInfo.name} Pokemon`;
+  return `https://www.tcgplayer.com/search/pokemon/product?productLineName=pokemon&q=${encodeURIComponent(query)}`;
+}
+
 function getEraKeyForSet(setData) {
   if (EARLIER_SERIES_IDS.includes(setData.serieId)) {
     return "swsh_and_earlier";
@@ -294,22 +339,22 @@ export default function SimulatorPage() {
     setRevealedCount(0);
   }
 
-  function handleResetCollection() {
-    if (!selectedSet) return;
+//   function handleResetCollection() {
+//     if (!selectedSet) return;
 
-    clearAnimationTimeouts();
+//     clearAnimationTimeouts();
 
-    setAllCollections((prev) => ({
-      ...prev,
-      [selectedSet.id]: {},
-    }));
+//     setAllCollections((prev) => ({
+//       ...prev,
+//       [selectedSet.id]: {},
+//     }));
 
-    setPendingPack([]);
-    setLastPack([]);
-    setEnteredCount(0);
-    setRevealedCount(0);
-    setIsOpeningPack(false);
-  }
+//     setPendingPack([]);
+//     setLastPack([]);
+//     setEnteredCount(0);
+//     setRevealedCount(0);
+//     setIsOpeningPack(false);
+//   }
 
   if (isLoadingSet) {
     return (
@@ -352,24 +397,79 @@ export default function SimulatorPage() {
   const uniqueCollected = Object.keys(collection).length;
   const totalCards = selectedSet.cards.length;
 
+  const setLogoSrc = getSetLogoSrc(selectedSet);
+  const logoPanelStyle = getSetHeroStyle(selectedSet);
+
   return (
     <div className="app">
-      <header className="header">
-        <h1>Pokemon Pack Simulator</h1>
+      <header className="simulator-hero">
+        <div className="simulator-hero-inner">
+          <div className="simulator-hero-main">
+            <div className="simulator-hero-logo-panel" style={logoPanelStyle}>
+                {setLogoSrc ? (
+                <img
+                    src={setLogoSrc}
+                    alt={`${selectedSet.name} logo`}
+                    className="simulator-hero-logo"
+                />
+                ) : (
+                <div className="simulator-hero-logo-fallback">
+                    {selectedSet.name}
+                </div>
+                )}
+            </div>
 
-        <div className="controls">
-          <button onClick={() => navigate("/")}>Change Set</button>
-          <button onClick={handleOpenPack}>Open Pack</button>
-          <button onClick={handleResetCollection}>Reset Set</button>
+            <div className="simulator-hero-copy">
+                <div className="simulator-hero-serie">
+                    {selectedSet.serieName || selectedSet.language}
+                    </div>
+                    <h1 className="simulator-hero-title">{selectedSet.name}</h1>
+
+                    <div className="simulator-hero-actions">
+                        <a
+                            className="hero-shop-button"
+                            href={getSetTcgplayerSearchUrl(selectedSet)}
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            Shop {selectedSet.name}
+                        </a>
+
+                        <button className="hero-open-pack-button" onClick={handleOpenPack}>
+                            <img
+                            src="/pokeball_open.png"
+                            alt=""
+                            className="hero-open-pack-icon"
+                            />
+                            <span>Open a Booster Pack</span>
+                        </button>
+
+                        <button
+                            className="hero-pill-button hero-pill-button-outline"
+                            onClick={() => navigate("/")}
+                        >
+                            Change Set
+                        </button>
+                    </div>
+                </div>
+            </div>   
         </div>
       </header>
 
       <main className="layout">
         <section className="content">
-          <h2>{selectedSet.language} - {selectedSet.name}</h2>
-          <h3>
-            Collection ({uniqueCollected}/{totalCards})
-          </h3>
+          <div className="collection-header">
+            <h2>
+              Collection ({uniqueCollected}/{totalCards})
+            </h2>
+
+            {/* <button
+              className="hero-pill-button hero-pill-button-outline"
+              onClick={handleResetCollection}
+            >
+              Reset Set
+            </button> */}
+          </div>
 
           <CollectionGrid
             collection={collection}

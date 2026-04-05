@@ -136,7 +136,9 @@ export default function SetSelectPage() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Pokemon Pack Simulator</h1>
+        <div className="header-inner">
+            <h1>Pokemon Pack Simulator</h1>
+        </div>
       </header>
 
       <main className="layout">
