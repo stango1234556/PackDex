@@ -25,8 +25,8 @@ export default function CollectionGrid({
         const tcgplayerPrice = getTcgplayerMarketPrice(cardEntry);
         const formattedPrice = formatUsdPrice(tcgplayerPrice);
 
-        console.log(cardEntry.pricing?.tcgplayer)
-        
+        console.log(cardEntry.pricing?.tcgplayer);
+
         return (
           <div
             key={`${cardEntry.id}-${cardEntry.pulledAs || "normal"}`}
@@ -36,6 +36,32 @@ export default function CollectionGrid({
               <img src={cardEntry.image} alt={cardEntry.name} />
               {isShiny && <div className="card-gloss" />}
               {isShiny && <div className="iridescent-shine" />}
+              {isShiny && (
+                <div className="sparkle-stars">
+                    {Array.from({ length: 24 }).map((_, index) => {
+                        const top = 6 + ((index * 17) % 82);
+                        const left = 5 + ((index * 29) % 86);
+                        const size = 8 + ((index * 7) % 10);
+                        const delay = ((index * 0.17) % 1.4).toFixed(2);
+                        const duration = (1.6 + ((index * 0.15) % 1.2)).toFixed(2);
+
+                        return (
+                        <span
+                                key={index}
+                                className="sparkle"
+                                style={{
+                                top: `${top}%`,
+                                left: `${left}%`,
+                                width: `${size}px`,
+                                height: `${size}px`,
+                                animationDelay: `${delay}s`,
+                                animationDuration: `${duration}s`,
+                            }}
+                        />
+                        );
+                    })}
+                </div>
+              )}
             </div>
 
             <div className="collection-card-body">
@@ -60,7 +86,7 @@ export default function CollectionGrid({
                 href={getTcgplayerSearchUrl(cardEntry, selectedSet)}
                 target="_blank"
                 rel="noreferrer"
-                >
+              >
                 <span className="shop-card-left">SHOP CARD</span>
                 <span className="shop-card-price">{formattedPrice || "--"}</span>
               </a>
