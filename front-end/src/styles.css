@@ -249,7 +249,6 @@ body {
   display: block;
 }
 
-/* subtle static gloss over the card */
 .card-gloss {
   position: absolute;
   inset: 0;
@@ -257,9 +256,9 @@ body {
   z-index: 2;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.16) 0%,
-    rgba(255, 255, 255, 0.06) 16%,
-    rgba(255, 255, 255, 0.015) 34%,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.08) 16%,
+    rgba(255, 255, 255, 0.02) 34%,
     rgba(255, 255, 255, 0) 60%,
     rgba(255, 255, 255, 0.05) 100%
   );
@@ -273,101 +272,188 @@ body {
   pointer-events: none;
   overflow: hidden;
   z-index: 3;
+  opacity: 0.5;
+  mix-blend-mode: color-dodge;
 }
 
-/* soft colorful wash */
 .iridescent-shine::before {
   content: "";
   position: absolute;
-  inset: -12%;
-  background:
-    radial-gradient(circle at 16% 20%, rgba(255, 90, 190, 0.20), transparent 24%),
-    radial-gradient(circle at 80% 18%, rgba(110, 225, 255, 0.22), transparent 26%),
-    radial-gradient(circle at 74% 78%, rgba(155, 125, 255, 0.18), transparent 24%),
-    radial-gradient(circle at 26% 84%, rgba(120, 255, 195, 0.16), transparent 26%),
-    linear-gradient(
-      125deg,
-      rgba(255, 80, 180, 0.10) 0%,
-      rgba(255, 215, 110, 0.08) 22%,
-      rgba(120, 255, 180, 0.10) 45%,
-      rgba(90, 220, 255, 0.10) 68%,
-      rgba(165, 120, 255, 0.10) 100%
-    );
-  mix-blend-mode: color-dodge;
-  filter: blur(10px) saturate(1.2);
-  opacity: 0.75;
-  animation: iridescentShift 3s ease-in-out infinite alternate;
+  inset: 0;
+  border-radius: inherit;
+  background-image: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(0, 231, 255, 0.9) 20%,
+    rgba(255, 0, 231, 0.9) 40%,
+    rgba(0, 231, 255, 0.9) 60%,
+    rgba(255, 0, 231, 0.9) 80%,
+    transparent 100%
+  );
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: 300% 300%;
+  animation: foilGradient 10s ease infinite;
+  opacity: 0.9;
 }
 
-/* moving bright band */
 .iridescent-shine::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: -40%;
-  width: 150%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.00) 0%,
-    rgba(255, 170, 210, 0.03) 8%,
-    rgba(255, 190, 230, 0.05) 16%,
-    rgba(255, 220, 180, 0.04) 24%,
-    rgba(255, 245, 190, 0.05) 32%,
-    rgba(210, 255, 210, 0.05) 40%,
-    rgba(180, 255, 235, 0.07) 46%,
-    rgba(200, 245, 255, 0.11) 49%,
-    rgba(255, 255, 255, 0.20) 50%,
-    rgba(215, 240, 255, 0.11) 51%,
-    rgba(190, 220, 255, 0.08) 56%,
-    rgba(205, 190, 255, 0.07) 64%,
-    rgba(230, 190, 255, 0.07) 72%,
-    rgba(255, 185, 235, 0.05) 82%,
-    rgba(255, 220, 240, 0.03) 92%,
-    rgba(255, 255, 255, 0.00) 100%
-  );
-  mix-blend-mode: screen;
-  filter: blur(6px) saturate(1.15);
-  opacity: 0.9;
-  animation: iridescentSweepX 2.8s ease-in-out infinite alternate;
+  inset: 0;
+  border-radius: inherit;
+  background-image:
+    radial-gradient(circle at 20% 25%, rgba(255, 255, 255, 0.95) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 20%, rgba(255, 255, 255, 0.9) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 32% 58%, rgba(255, 255, 255, 0.85) 0 2px, transparent 3px),
+    radial-gradient(circle at 68% 72%, rgba(255, 255, 255, 0.92) 0 2px, transparent 3px),
+    radial-gradient(circle at 48% 40%, rgba(255, 255, 255, 0.8) 0 1.5px, transparent 2.5px);
+  background-repeat: no-repeat;
+  background-size: 160% 160%;
+  background-position: 50% 50%;
+  mix-blend-mode: color-dodge;
+  opacity: 0.75;
+  animation: sparkleShift 5.5s linear infinite;
 }
 
-.reverse-holo-card .iridescent-shine::before {
-  opacity: 0.95;
-}
-
-.reverse-holo-card .iridescent-shine::after {
+.reverse-holo-card .iridescent-shine {
   opacity: 1;
 }
 
-.holo-card .iridescent-shine::before {
-  opacity: 0.62;
+.reverse-holo-card .iridescent-shine::before {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 231, 255, 0.95) 20%,
+    rgba(255, 0, 231, 0.95) 40%,
+    rgba(0, 231, 255, 0.95) 60%,
+    rgba(255, 0, 231, 0.95) 80%,
+    transparent 100%
+  );
 }
 
-.holo-card .iridescent-shine::after {
-  opacity: 0.82;
+.holo-card .iridescent-shine {
+  opacity: 0.8;
 }
 
-@keyframes iridescentSweepX {
+@keyframes foilGradient {
   0% {
-    transform: translateX(-32%);
-    filter: hue-rotate(0deg) saturate(1.2) blur(3px);
+    opacity: 0.5;
+    background-position: 50% 50%;
+  }
+  25% {
+    background-position: 0% 0%;
+    opacity: 0.5;
+  }
+  50% {
+    background-position: 100% 100%;
+    opacity: 0.5;
+  }
+  75% {
+    background-position: 0% 0%;
+    opacity: 0.5;
   }
   100% {
-    transform: translateX(32%);
-    filter: hue-rotate(18deg) saturate(1.45) blur(3px);
+    opacity: 0.5;
+    background-position: 50% 50%;
   }
 }
 
-@keyframes iridescentShift {
+@keyframes sparkleShift {
   0% {
-    transform: translateX(-2%) translateY(1%) scale(1.03);
-    filter: hue-rotate(0deg) saturate(1.05) blur(10px);
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(1.5%, -1.5%, 0) scale(1.03);
+    opacity: 0.82;
   }
   100% {
-    transform: translateX(2%) translateY(-2%) scale(1.06);
-    filter: hue-rotate(12deg) saturate(1.15) blur(10px);
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
   }
+}
+
+.sparkle-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 4;
+}
+
+.sparkle {
+  position: absolute;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5));
+  animation-name: sparkleTwinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.sparkle::before,
+.sparkle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 1) 48%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.sparkle::before {
+  width: 2px;
+  height: 100%;
+}
+
+.sparkle::after {
+  width: 100%;
+  height: 2px;
+}
+
+@keyframes sparkleTwinkle {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.15) rotate(0deg);
+  }
+  12% {
+    opacity: 0.3;
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(45deg);
+  }
+  40% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(0.7) rotate(45deg);
+  }
+  55% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2) rotate(90deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2) rotate(90deg);
+  }
+}
+
+.reverse-holo-card .sparkle {
+  filter:
+    drop-shadow(0 0 8px rgba(180, 240, 255, 0.65))
+    drop-shadow(0 0 14px rgba(255, 255, 255, 0.2));
+}
+
+.holo-card .sparkle {
+  filter:
+    drop-shadow(0 0 8px rgba(255, 230, 180, 0.6))
+    drop-shadow(0 0 14px rgba(255, 255, 255, 0.18));
 }
 
 .card-back-image {
