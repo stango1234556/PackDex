@@ -187,6 +187,30 @@ export default function SetSelectPage() {
           </div>
         </section>
       </main>
+
+      <footer className="site-footer">
+        <div className="site-footer-disclaimer">
+          <p>
+            This website is an unofficial fan-made project and is not produced,
+            endorsed, supported, or affiliated with Nintendo, The Pokémon Company,
+            or GAME FREAK.
+          </p>
+          <p>
+            Card prices, market values, and promotional offers are provided by
+            third-party sources and are intended as estimates only. No guarantee is
+            made regarding the accuracy, completeness, or timeliness of any pricing
+            information. Please refer to official sellers and marketplaces for final
+            prices and details.
+          </p>
+          <p>
+            Pack simulation odds, card data, and set information are based on
+            third-party resources and may not perfectly reflect real-world products.
+            No guarantee is made regarding pull rates, card availability, or
+            simulation accuracy. Please refer to official Pokémon TCG products for
+            final results.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
