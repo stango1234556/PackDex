@@ -39,7 +39,25 @@ export default function SetSelectPage() {
   const [sets, setSets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
-  
+
+  useEffect(() => {
+  async function logSunMoonSets() {
+    const tcgdex = new TCGdex("en");
+    const serie = await tcgdex.fetch("series", "swsh");
+
+    console.log(
+      "Sword and Shield sets:",
+      serie.sets.map((set) => ({
+        id: set.id,
+        name: set.name,
+        releaseDate: set.releaseDate,
+        cardCount: set.cardCount,
+      }))
+    );
+  }
+
+  logSunMoonSets();
+}, []);
 
   useEffect(() => {
     async function fetchSetList() {
@@ -76,9 +94,7 @@ export default function SetSelectPage() {
           );
 
         const filteredSets = allSets.filter(
-          (set) =>
-            endsWithNumber(set.id) &&
-            !EXCLUDED_SET_NAMES.has(set.name)
+          (set) => endsWithNumber(set.id) && !EXCLUDED_SET_NAMES.has(set.name)
         );
 
         const uniqueSets = Array.from(
@@ -86,12 +102,12 @@ export default function SetSelectPage() {
         );
 
         const sortedSets = [...uniqueSets]
-        .sort((a, b) => {
+          .sort((a, b) => {
             const aTime = a.releaseDate ? new Date(a.releaseDate).getTime() : 0;
             const bTime = b.releaseDate ? new Date(b.releaseDate).getTime() : 0;
             return aTime - bTime;
-        })
-        .reverse();
+          })
+          .reverse();
 
         setSets(sortedSets);
       } catch (error) {
@@ -111,11 +127,13 @@ export default function SetSelectPage() {
 
   if (isLoading) {
     return (
-      <div className="app">
-        <div className="layout">
-          <section className="content">
-            <p>Loading set list...</p>
-          </section>
+      <div className="app loading-screen">
+        <div className="loading-spinner-wrap">
+          <img
+            src="/pokeball.svg"
+            alt="Loading"
+            className="loading-pokeball-spinner"
+          />
         </div>
       </div>
     );
@@ -137,7 +155,7 @@ export default function SetSelectPage() {
     <div className="app">
       <header className="header">
         <div className="header-inner">
-            <h1>PackDex</h1>
+          <h1>PackDex</h1>
         </div>
       </header>
 
@@ -147,20 +165,19 @@ export default function SetSelectPage() {
 
           <div className="set-select-grid">
             {sets.map((setInfo) => (
-                
               <button
                 key={setInfo.id}
                 className="set-select-card"
                 onClick={() => handleSelectSet(setInfo)}
               >
                 {getSetLogoSrc(setInfo) && (
-                    <div className="set-select-logo-wrap">
-                        <img
-                        src={getSetLogoSrc(setInfo)}
-                        alt={`${setInfo.name} logo`}
-                        className="set-select-logo"
-                        />
-                    </div>
+                  <div className="set-select-logo-wrap">
+                    <img
+                      src={getSetLogoSrc(setInfo)}
+                      alt={`${setInfo.name} logo`}
+                      className="set-select-logo"
+                    />
+                  </div>
                 )}
 
                 <div className="set-select-language">{setInfo.serieName}</div>

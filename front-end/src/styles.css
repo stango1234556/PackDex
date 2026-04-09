@@ -197,6 +197,7 @@ body {
   perspective: 1000px;
   opacity: 0;
   transform: translateY(-18px);
+  position: relative;
 }
 
 .flip-card-shell.card-entered {
@@ -216,6 +217,7 @@ body {
 
 .flip-card-inner {
   position: relative;
+  z-index: 2;
   width: 100%;
   aspect-ratio: 240 / 336;
   transform-style: preserve-3d;
@@ -313,7 +315,6 @@ body {
   background-position: 50% 50%;
   mix-blend-mode: color-dodge;
   opacity: 0.75;
-  animation: sparkleShift 5.5s linear infinite;
 }
 
 .reverse-holo-card .iridescent-shine {
@@ -357,103 +358,6 @@ body {
     opacity: 0.5;
     background-position: 50% 50%;
   }
-}
-
-@keyframes sparkleShift {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: 0.55;
-  }
-  50% {
-    transform: translate3d(1.5%, -1.5%, 0) scale(1.03);
-    opacity: 0.82;
-  }
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: 0.55;
-  }
-}
-
-.sparkle-stars {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 4;
-}
-
-.sparkle {
-  position: absolute;
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5));
-  animation-name: sparkleTwinkle;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-
-.sparkle::before,
-.sparkle::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 999px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 1) 48%,
-    rgba(255, 255, 255, 0) 100%
-  );
-}
-
-.sparkle::before {
-  width: 2px;
-  height: 100%;
-}
-
-.sparkle::after {
-  width: 100%;
-  height: 2px;
-}
-
-@keyframes sparkleTwinkle {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.15) rotate(0deg);
-  }
-  12% {
-    opacity: 0.3;
-  }
-  25% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1) rotate(45deg);
-  }
-  40% {
-    opacity: 0.7;
-    transform: translate(-50%, -50%) scale(0.7) rotate(45deg);
-  }
-  55% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.2) rotate(90deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.2) rotate(90deg);
-  }
-}
-
-.reverse-holo-card .sparkle {
-  filter:
-    drop-shadow(0 0 8px rgba(180, 240, 255, 0.65))
-    drop-shadow(0 0 14px rgba(255, 255, 255, 0.2));
-}
-
-.holo-card .sparkle {
-  filter:
-    drop-shadow(0 0 8px rgba(255, 230, 180, 0.6))
-    drop-shadow(0 0 14px rgba(255, 255, 255, 0.18));
 }
 
 .card-back-image {
@@ -677,4 +581,248 @@ body {
 
 .collection-header h2 {
   margin: 0;
+}
+
+.hit-card-shell {
+  z-index: 40;
+}
+
+.hit-card-shell::before {
+  content: "";
+  position: absolute;
+  inset: -34px;
+  border-radius: 24px;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    circle,
+    rgba(255,255,255,0.95) 0%,
+    rgba(255,240,170,0.75) 14%,
+    rgba(255,160,220,0.38) 34%,
+    rgba(120,220,255,0.26) 52%,
+    rgba(255,255,255,0) 74%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: hitBackdropFlash 0.55s ease-out forwards;
+}
+
+.hit-card-shell::after {
+  content: "";
+  position: absolute;
+  inset: -54px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255,255,255,0) 0deg,
+    rgba(255,247,190,0.95) 20deg,
+    rgba(255,255,255,0) 40deg,
+    rgba(255,165,230,0.8) 75deg,
+    rgba(255,255,255,0) 105deg,
+    rgba(150,230,255,0.82) 145deg,
+    rgba(255,255,255,0) 180deg,
+    rgba(255,225,150,0.78) 220deg,
+    rgba(255,255,255,0) 255deg,
+    rgba(255,130,220,0.8) 292deg,
+    rgba(255,255,255,0) 326deg,
+    rgba(255,248,200,0.9) 348deg,
+    rgba(255,255,255,0) 360deg
+  );
+  filter: blur(10px) saturate(1.2);
+  opacity: 0;
+  transform: scale(0.6) rotate(0deg);
+  animation: hitRayWheel 0.8s ease-out forwards;
+}
+
+.hit-card-revealed {
+  z-index: 2;
+  animation:
+    hitCardPunch 0.68s cubic-bezier(0.2, 0.9, 0.25, 1.25),
+    hitCardBrightness 1.15s ease-out;
+  transform-origin: center center;
+}
+
+@keyframes hitCardPunch {
+  0% {
+    transform: rotateY(180deg) scale(1);
+  }
+  22% {
+    transform: rotateY(180deg) scale(1.28);
+  }
+  46% {
+    transform: rotateY(180deg) scale(1.1);
+  }
+  70% {
+    transform: rotateY(180deg) scale(1.16);
+  }
+  100% {
+    transform: rotateY(180deg) scale(1);
+  }
+}
+
+@keyframes hitCardBrightness {
+  0% {
+    filter:
+      brightness(1)
+      drop-shadow(0 0 0 rgba(255,255,255,0))
+      drop-shadow(0 0 0 rgba(255,220,150,0));
+  }
+  18% {
+    filter:
+      brightness(1.5)
+      drop-shadow(0 0 18px rgba(255,255,255,0.75))
+      drop-shadow(0 0 36px rgba(255,220,150,0.5))
+      drop-shadow(0 0 56px rgba(255,120,220,0.28));
+  }
+  100% {
+    filter:
+      brightness(1)
+      drop-shadow(0 0 0 rgba(255,255,255,0))
+      drop-shadow(0 0 0 rgba(255,220,150,0));
+  }
+}
+
+@keyframes hitBackdropFlash {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  28% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes hitRayWheel {
+  0% {
+    opacity: 0;
+    transform: scale(0.58) rotate(0deg);
+  }
+  24% {
+    opacity: 1;
+    transform: scale(1.02) rotate(24deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.32) rotate(70deg);
+  }
+}
+
+.sparkle-video-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 4;
+  mix-blend-mode: screen;
+  opacity: 0.9;
+}
+
+.close-overlay-button {
+  background: #111;
+  color: white;
+  min-height: 50px;
+  border-radius: 999px;
+  padding: 0 22px;
+  font-size: 15px;
+  font-weight: 700;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.close-overlay-button:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.close-overlay-button:active {
+  transform: scale(0.98);
+}
+
+.pack-overlay-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.open-another-button {
+  background: #3b8eea;
+  color: white;
+  min-height: 50px;
+  border-radius: 999px;
+  padding: 0 22px;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease,
+    visibility 0s linear 0.45s,
+    background 0.15s ease;
+}
+
+.open-another-button-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition:
+    opacity 0.45s ease 0.3s,
+    transform 0.45s ease 0.3s,
+    visibility 0s linear 0s,
+    background 0.15s ease;
+}
+
+.open-another-button:hover {
+  background: #2f7dd4;
+}
+
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-pokeball-spinner {
+  width: 88px;
+  height: 88px;
+  display: block;
+  animation: pokeballSpin 1s linear infinite;
+}
+
+@keyframes pokeballSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

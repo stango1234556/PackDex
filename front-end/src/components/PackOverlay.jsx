@@ -1,27 +1,52 @@
-import { getFinishClass, hasSpecialFinish } from "../data/cardDisplay";
+import {
+  getFinishClass,
+  hasSpecialFinish,
+  hasSparkleFinish,
+  isHitCard,
+} from "../data/cardDisplay";
 
 export default function PackOverlay({
   isOpeningPack,
   lastPack,
   enteredCount,
   revealedCount,
+  hitEffectCount,
   selectedSet,
   handleCloseOverlay,
+  handleOpenAnotherPack,
 }) {
   if (!isOpeningPack || lastPack.length === 0) {
     return null;
   }
 
-  const commonRow = lastPack.slice(0, 5);
-  const uncommonRow = lastPack.slice(5, 8);
-  const rareRow = lastPack.slice(8, 10);
+  const isModern =
+    selectedSet?.serieId !== "swsh" &&
+    !["base", "ex", "dp", "pl", "hgss", "bw", "xy", "sm"].includes(
+      selectedSet?.serieId
+    );
 
-  const displayRows = [rareRow, uncommonRow, commonRow];
+  let displayRows;
+
+  if (isModern) {
+    const bottomRow = lastPack.slice(0, 4);
+    const middleRow = lastPack.slice(4, 7);
+    const topRow = lastPack.slice(7, 10);
+
+    displayRows = [topRow, middleRow, bottomRow];
+  } else {
+    const commonRow = lastPack.slice(0, 5);
+    const uncommonRow = lastPack.slice(5, 8);
+    const rareRow = lastPack.slice(8, 10);
+
+    displayRows = [rareRow, uncommonRow, commonRow];
+  }
 
   const animationIndexById = {};
   lastPack.forEach((card, index) => {
     animationIndexById[card.id] = index;
   });
+
+  const allCardsFlipped = revealedCount >= lastPack.length;
 
   return (
     <div className="pack-overlay" onClick={handleCloseOverlay}>
@@ -31,12 +56,26 @@ export default function PackOverlay({
       >
         <div className="pack-overlay-header">
           <h2>{selectedSet.name}</h2>
-          <button
-            className="close-overlay-button"
-            onClick={handleCloseOverlay}
-          >
-            Close
-          </button>
+
+          <div className="pack-overlay-header-actions">
+            <button
+              className={`open-another-button ${
+                allCardsFlipped ? "open-another-button-visible" : ""
+              }`}
+              onClick={handleOpenAnotherPack}
+              type="button"
+            >
+              Open Another
+            </button>
+
+            <button
+              className="close-overlay-button"
+              onClick={handleCloseOverlay}
+              type="button"
+            >
+              Close
+            </button>
+          </div>
         </div>
 
         <div className="overlay-pack-rows">
@@ -46,13 +85,18 @@ export default function PackOverlay({
                 const animationIndex = animationIndexById[card.id];
                 const hasEntered = animationIndex < enteredCount;
                 const isFlipped = animationIndex < revealedCount;
+                const hitEffectActive = animationIndex < hitEffectCount;
                 const finishClass = getFinishClass(card);
                 const isShiny = hasSpecialFinish(card);
+                const hasSparkles = hasSparkleFinish(card);
+                const isHit = isHitCard(card);
 
                 return (
                   <div
                     key={`overlay-${card.id}-${cardIndex}`}
-                    className={`flip-card-shell ${hasEntered ? "card-entered" : ""}`}
+                    className={`flip-card-shell ${hasEntered ? "card-entered" : ""} ${
+                      isHit && hitEffectActive ? "hit-card-shell" : ""
+                    }`}
                   >
                     <div
                       className={`flip-card-inner ${isFlipped ? "flipped" : ""}`}
@@ -66,38 +110,24 @@ export default function PackOverlay({
                       </div>
 
                       <div
-                        className={`flip-card-face flip-card-front ${finishClass}`}
+                        className={`flip-card-face flip-card-front ${finishClass} ${
+                          isHit && hitEffectActive ? "hit-card-revealed" : ""
+                        }`}
                       >
                         <img src={card.image} alt={card.name} />
-                        {isShiny && (
-                          <>
-                            <div className="iridescent-shine" />
-                            <div className="card-gloss" />
-                            <div className="sparkle-stars">
-                                {Array.from({ length: 24 }).map((_, index) => {
-                                    const top = 6 + ((index * 17) % 82);
-                                    const left = 5 + ((index * 29) % 86);
-                                    const size = 8 + ((index * 7) % 10);
-                                    const delay = ((index * 0.17) % 1.4).toFixed(2);
-                                    const duration = (1.6 + ((index * 0.15) % 1.2)).toFixed(2);
 
-                                    return (
-                                    <span
-                                        key={index}
-                                        className="sparkle"
-                                        style={{
-                                            top: `${top}%`,
-                                            left: `${left}%`,
-                                            width: `${size}px`,
-                                            height: `${size}px`,
-                                            animationDelay: `${delay}s`,
-                                            animationDuration: `${duration}s`,
-                                        }}
-                                    />
-                                    );
-                                })}
-                            </div>
-                          </>
+                        {isShiny && <div className="iridescent-shine" />}
+                        {isShiny && <div className="card-gloss" />}
+
+                        {hasSparkles && (
+                          <video
+                            className="sparkle-video-overlay"
+                            src="/sparkles.mp4"
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                          />
                         )}
                       </div>
                     </div>

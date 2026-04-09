@@ -23,15 +23,29 @@ async function fetchJson(url) {
 function mapCardData(fullCard, fallbackCard = {}) {
   const imageBase = fullCard.image || fallbackCard.image || "";
 
+  let canBeReverseHolo = fullCard.variants?.reverse === true;
+
+  // Hidden Fates fix (sm115)
+  const setId = fullCard.set?.id || fallbackCard.set?.id;
+  const localId = parseInt(fullCard.localId || fallbackCard.localId, 10);
+  const name = fullCard.name || fallbackCard.name || "";
+
+  if (setId === "sm115") {
+    if (!isNaN(localId) && localId >= 1 && localId <= 65 && !name.includes("GX")) {
+      canBeReverseHolo = true;
+    }
+  }
+
   return {
     id: fullCard.id || fallbackCard.id,
     localId: fullCard.localId || fallbackCard.localId || "",
     name: fullCard.name || fallbackCard.name || "Unknown Card",
     image: imageBase ? `${imageBase}/high.webp` : "",
     rarity: normalizeRarity(fullCard.rarity || fallbackCard.rarity),
+    category: fullCard.category || fallbackCard.category || "",
     variants: fullCard.variants || fallbackCard.variants || {},
     pricing: fullCard.pricing || null,
-    canBeReverseHolo: fullCard.variants?.reverse === true,
+    canBeReverseHolo,
     canBeHolo: fullCard.variants?.holo === true,
   };
 }
@@ -53,18 +67,8 @@ async function mapWithConcurrency(items, limit, asyncMapper) {
   return results;
 }
 
-export async function loadSimulatorSet(setId, language = "en") {
-  const apiSet = await fetchJson(`https://api.tcgdex.net/v2/${language}/sets/${setId}`);
-
-  if (!apiSet) {
-    throw new Error(`Set not found for id "${setId}" in language "${language}"`);
-  }
-
-  if (!apiSet.cards || !Array.isArray(apiSet.cards)) {
-    throw new Error(`Set "${setId}" did not return a cards array`);
-  }
-
-  const fullCards = await mapWithConcurrency(apiSet.cards, 12, async (cardResume) => {
+async function loadCardsForSet(apiSet, language) {
+  return mapWithConcurrency(apiSet.cards, 12, async (cardResume) => {
     try {
       const fullCard = await fetchJson(
         `https://api.tcgdex.net/v2/${language}/cards/${cardResume.id}`
@@ -92,6 +96,31 @@ export async function loadSimulatorSet(setId, language = "en") {
       );
     }
   });
+}
+
+export async function loadSimulatorSet(setId, language = "en") {
+  const apiSet = await fetchJson(`https://api.tcgdex.net/v2/${language}/sets/${setId}`);
+
+  if (!apiSet) {
+    throw new Error(`Set not found for id "${setId}" in language "${language}"`);
+  }
+
+  if (!apiSet.cards || !Array.isArray(apiSet.cards)) {
+    throw new Error(`Set "${setId}" did not return a cards array`);
+  }
+
+  let fullCards = await loadCardsForSet(apiSet, language);
+
+  if (setId === "sm115") {
+    const shinyVaultSet = await fetchJson(`https://api.tcgdex.net/v2/${language}/sets/sma`);
+
+    if (!shinyVaultSet || !Array.isArray(shinyVaultSet.cards)) {
+      throw new Error(`Set "sma" did not return a cards array`);
+    }
+
+    const shinyVaultCards = await loadCardsForSet(shinyVaultSet, language);
+    fullCards = [...fullCards, ...shinyVaultCards];
+  }
 
   const tcgplayerTestCard = fullCards.find(
     (card) => card?.pricing?.tcgplayer != null
@@ -101,19 +130,24 @@ export async function loadSimulatorSet(setId, language = "en") {
     (card) => card?.pricing?.cardmarket != null
   );
 
-console.log("TCGplayer test card:", tcgplayerTestCard);
-console.log("CardMarket test card:", cardmarketTestCard.pricing.cardmarket);
+  console.log("TCGplayer test card:", tcgplayerTestCard);
 
-if (tcgplayerTestCard) {
-  console.log(
-    "TCGplayer id:",
-    tcgplayerTestCard.pricing.tcgplayer.id,
-    "name:",
-    tcgplayerTestCard.name
-  );
-} else {
-  console.log("No card found with tcgplayer id > 0 in this set.");
-}
+  if (cardmarketTestCard) {
+    console.log("CardMarket test card:", cardmarketTestCard.pricing.cardmarket);
+  } else {
+    console.log("No card found with CardMarket pricing in this set.");
+  }
+
+  if (tcgplayerTestCard) {
+    console.log(
+      "TCGplayer id:",
+      tcgplayerTestCard.pricing.tcgplayer.id,
+      "name:",
+      tcgplayerTestCard.name
+    );
+  } else {
+    console.log("No card found with tcgplayer id > 0 in this set.");
+  }
 
   return {
     id: apiSet.id,
