@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TCGdex from "@tcgdex/sdk";
 
-const EXCLUDED_SERIE_IDS = new Set(["misc", "mc", "tk", "tcgp", "pop"]);
+const EXCLUDED_SERIE_IDS = new Set(["misc", "mc", "tk", "tcgp", "pop", "det1"]);
 
 const EXCLUDED_SET_NAMES = new Set([
   "Kalos Starter Set",
@@ -10,6 +10,7 @@ const EXCLUDED_SET_NAMES = new Set([
   "Pokémon Rumble",
   "Poké Card Creator Pack",
   "Southern Islands",
+  "Detective Pikachu",
 ]);
 
 const MANUAL_SET_LOGOS_BY_NAME = {
@@ -43,7 +44,7 @@ export default function SetSelectPage() {
   useEffect(() => {
   async function logSunMoonSets() {
     const tcgdex = new TCGdex("en");
-    const serie = await tcgdex.fetch("series", "swsh");
+    const serie = await tcgdex.fetch("series", "sm");
 
     console.log(
       "Sword and Shield sets:",

@@ -97,11 +97,7 @@ function getSetLogoSrc(setInfo) {
   return null;
 }
 
-function getSetHeroStyle(setInfo) {
-  if (SET_THEME_BY_NAME[setInfo.name]) {
-    return SET_THEME_BY_NAME[setInfo.name];
-  }
-
+function getSetHeroStyle() {
   return {
     background: "linear-gradient(135deg, #1f2730 0%, #2d2d2d 45%, #171717 100%)",
   };
