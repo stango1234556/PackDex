@@ -3,6 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { loadSimulatorSet } from "../api/loadSimulatorSet";
 import PackOverlay from "../components/PackOverlay";
 import CollectionGrid from "../components/CollectionGrid";
+import {
+  getTcgplayerMarketPrice,
+  formatUsdPrice,
+} from "../data/cardDisplay";
 
 const ENTER_DELAY_MS = 100;
 const FLIP_DELAY_MS = 225;
@@ -764,6 +768,12 @@ useEffect(() => {
 
     const pack = openPack(selectedSet);
 
+    const testCard = pack.find((card) => card.pricing);
+
+    console.log("TEST CARD:", testCard);
+    console.log("TEST CARD PRICING:", testCard?.pricing);
+    console.log("TEST CARD TCGPLAYER:", testCard?.pricing?.tcgplayer);
+
     console.log(
       "Pulled pack:",
       pack.map((card, index) => ({
@@ -773,9 +783,12 @@ useEffect(() => {
         pulledAs: card.pulledAs,
         setName: card.setName,
         localId: card.localId,
+
         normal: card?.variants?.normal ?? false,
         reverse: card?.variants?.reverse ?? false,
         holo: card?.variants?.holo ?? false,
+
+        pricing: card?.pricing?.tcgplayer ?? null,
       }))
     );
 

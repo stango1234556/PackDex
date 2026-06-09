@@ -296,10 +296,6 @@ export function getTcgplayerSearchUrl(card, selectedSet) {
     parts.push("Holo");
   }
 
-  if (card.localId) {
-    parts.push(card.localId);
-  }
-
   const params = new URLSearchParams({
     productLineName: "pokemon",
     q: parts.join(" "),
@@ -315,11 +311,25 @@ export function getTcgplayerSearchUrl(card, selectedSet) {
 }
 
 export function getTcgplayerMarketPrice(card) {
+  const tcgplayer = card?.pricing?.tcgplayer;
+
+  if (!tcgplayer) return null;
+
   if (card.pulledAs === "Reverse Holo") {
-    return card.pricing?.tcgplayer?.reverse?.marketPrice ?? null;
+    return (
+      tcgplayer["reverse-holofoil"]?.marketPrice ??
+      tcgplayer.holofoil?.marketPrice ??
+      tcgplayer.normal?.marketPrice ??
+      null
+    );
   }
 
-  return card.pricing?.tcgplayer?.normal?.marketPrice ?? null;
+  return (
+    tcgplayer.holofoil?.marketPrice ??
+    tcgplayer.normal?.marketPrice ??
+    tcgplayer["reverse-holofoil"]?.marketPrice ??
+    null
+  );
 }
 
 export function formatUsdPrice(price) {

@@ -42,25 +42,6 @@ export default function SetSelectPage() {
   const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
-  async function logSunMoonSets() {
-    const tcgdex = new TCGdex("en");
-    const serie = await tcgdex.fetch("series", "sm");
-
-    console.log(
-      "Sword and Shield sets:",
-      serie.sets.map((set) => ({
-        id: set.id,
-        name: set.name,
-        releaseDate: set.releaseDate,
-        cardCount: set.cardCount,
-      }))
-    );
-  }
-
-  logSunMoonSets();
-}, []);
-
-  useEffect(() => {
     async function fetchSetList() {
       try {
         setIsLoading(true);
