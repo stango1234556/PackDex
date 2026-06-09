@@ -299,6 +299,9 @@ export function getTcgplayerSearchUrl(card, selectedSet) {
   const params = new URLSearchParams({
     productLineName: "pokemon",
     q: parts.join(" "),
+    view: "grid",
+    ProductTypeName: "Cards",
+    page: "1",
   });
 
   if (isReverse) {
