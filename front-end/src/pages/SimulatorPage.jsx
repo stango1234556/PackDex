@@ -58,15 +58,17 @@ const ERA_PACK_RULES = {
       Rare: 1,
     },
     slot9Weights: {
-      reverse: 72,
-      illustration: 20,
-      hyper: 8,
+      // reverse: 72,
+      // illustration: 20,
+      // hyper: 8,
+      reverse: 90,
+      illustration: 8,
+      hyper: 2,
     },
     slot10Weights: {
-      Rare: 65,
-      "Double Rare": 22,
-      "Ultra Rare": 10,
-      "Hyper Rare": 3,
+      Rare: 80,
+      "Double Rare": 14,
+      "Ultra Rare": 6,
     },
   },
 };
@@ -539,10 +541,12 @@ function openPack(setData) {
 
   const slot10Pool = setData.cards.filter(
     (card) =>
-      card.rarity === "Rare" ||
+      (
+        card.rarity === "Rare" &&
+        card.variants?.normal === true
+      ) ||
       isDoubleRare(card) ||
-      card.rarity === "Ultra Rare" ||
-      card.rarity === "Hyper Rare"
+      card.rarity === "Ultra Rare"
   );
 
   const slot8CardBase = takeWeightedUnique(
@@ -583,7 +587,7 @@ function openPack(setData) {
     const pickedIllustration = takeWeightedUnique(
       buildUniquePool(availableIllustrationPool),
       {
-        "Illustration Rare": 4,
+        "Illustration Rare": 9,
         "Special Illustration Rare": 1,
       },
       usedIds
@@ -622,21 +626,12 @@ function openPack(setData) {
     usedIds
   );
 
-  let slot10PulledAs = "Rare Slot";
-
-  const isHoloOnlySlot10Card =
-    slot10CardBase?.variants?.holo === true &&
-    slot10CardBase?.variants?.normal !== true;
+  let slot10PulledAs = "Normal";
 
   if (slot10CardBase?.rarity === "Double Rare") {
     slot10PulledAs = "Double Rare";
-  } else if (
-    slot10CardBase?.rarity === "Ultra Rare" ||
-    slot10CardBase?.rarity === "Hyper Rare"
-  ) {
+  } else if (slot10CardBase?.rarity === "Ultra Rare") {
     slot10PulledAs = "Ultra Rare";
-  } else if (isHoloOnlySlot10Card) {
-    slot10PulledAs = "Holo";
   }
 
   const slot10Card = slot10CardBase
@@ -705,18 +700,18 @@ export default function SimulatorPage() {
     fetchSet();
   }, [setId, language]);
 
-useEffect(() => {
-  if (!selectedSet) return;
+  useEffect(() => {
+    if (!selectedSet) return;
 
-  console.table(
-    selectedSet.cards.map((card) => ({
-      name: card.name,
-      normal: card.variants?.normal ?? false,
-      reverse: card.variants?.reverse ?? false,
-      holo: card.variants?.holo ?? false,
-    }))
-  );
-}, [selectedSet]);
+    console.table(
+      selectedSet.cards.map((card) => ({
+        name: card.name,
+        normal: card.variants?.normal ?? false,
+        reverse: card.variants?.reverse ?? false,
+        holo: card.variants?.holo ?? false,
+      }))
+    );
+  }, [selectedSet]);
 
   useEffect(() => {
     return () => {

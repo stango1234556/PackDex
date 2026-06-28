@@ -26,6 +26,20 @@ export const rarityIconMap = {
   "Secret Rare": "/rare-holo.svg",
 };
 
+const TCGPLAYER_RARITY_MAP = {
+  "Common": "Common",
+  "Uncommon": "Uncommon",
+  "Rare": "Rare",
+  "Holo Rare": "Rare Holo",
+  "Double Rare": "Double Rare",
+  "Illustration Rare": "Illustration Rare",
+  "Special Illustration Rare": "Special Illustration Rare",
+  "Ultra Rare": "Ultra Rare",
+  "Hyper Rare": "Hyper Rare",
+  "Secret Rare": "Secret Rare",
+  "Amazing Rare": "Amazing Rare",
+};
+
 export function isReverseCard(card) {
   return card.pulledAs === "Reverse Holo";
 }
@@ -290,12 +304,6 @@ export function getTcgplayerSearchUrl(card, selectedSet) {
 
   const parts = [card.name, selectedSet.name];
 
-  if (isReverse) {
-    parts.push("Reverse Holo");
-  } else if (isFoil) {
-    parts.push("Holo");
-  }
-
   const params = new URLSearchParams({
     productLineName: "pokemon",
     q: parts.join(" "),
@@ -303,6 +311,12 @@ export function getTcgplayerSearchUrl(card, selectedSet) {
     ProductTypeName: "Cards",
     page: "1",
   });
+
+  const rarity = TCGPLAYER_RARITY_MAP[card.rarity];
+
+  if (rarity) {
+    params.set("Rarity", rarity);
+  }
 
   if (isReverse) {
     params.set("Printing", "Reverse Holofoil");

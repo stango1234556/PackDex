@@ -3,6 +3,9 @@ function normalizeRarity(rarity) {
 
   const value = rarity.toLowerCase();
 
+  if (value.includes("special illustration")) return "Special Illustration Rare";
+  if (value.includes("illustration")) return "Illustration Rare";
+  if (value.includes("double")) return "Double Rare";
   if (value.includes("hyper")) return "Hyper Rare";
   if (value.includes("secret")) return "Secret Rare";
   if (value.includes("ultra")) return "Ultra Rare";
