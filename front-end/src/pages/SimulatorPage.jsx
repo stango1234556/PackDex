@@ -62,8 +62,8 @@ const ERA_PACK_RULES = {
       // illustration: 20,
       // hyper: 8,
       reverse: 90,
-      illustration: 8,
-      hyper: 2,
+      illustration: 9,
+      hyper: 1,
     },
     slot10Weights: {
       Rare: 80,
@@ -763,7 +763,9 @@ export default function SimulatorPage() {
 
     const pack = openPack(selectedSet);
 
-    const testCard = pack.find((card) => card.pricing);
+    const testCard = selectedSet.cards.find(
+      (card) => card.localId === "008"
+    );
 
     console.log("TEST CARD:", testCard);
     console.log("TEST CARD PRICING:", testCard?.pricing);
