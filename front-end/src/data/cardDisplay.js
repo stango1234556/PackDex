@@ -14,9 +14,9 @@ export const rarityIconMap = {
   "Rare Shiny V": "/rare-holo.svg",
   "Rare Shiny VMAX": "/rare-holo.svg",
   "Full Art": "/rare-holo.svg",
-  "Reverse Holo Common": "/common-holo.svg",
-  "Reverse Holo Uncommon": "/uncommon-holo.svg",
-  "Reverse Holo Rare": "/rare-holo.svg",
+  "Common Reverse Holo": "/common-holo.svg",
+  "Uncommon Reverse Holo": "/uncommon-holo.svg",
+  "Rare Reverse Holo": "/rare-holo.svg",
   "Radiant Rare": "/rare-holo.svg",
   "Double Rare": "/rare-holo.svg",
   "Illustration Rare": "/rare-holo.svg",
@@ -97,6 +97,7 @@ function isPaldeanFatesShinyRare(card) {
 export function isFoilCard(card) {
   if (isReverseCard(card)) return false;
 
+  if (card.pulledAs === "Holo") return true;
   if (isRadiantCard(card)) return true;
   if (isHoloOnlyRare(card)) return true;
   if (hasNoVariants(card)) return true;
@@ -236,7 +237,7 @@ export function getCollectionDisplayRarity(card) {
   }
 
   if (isReverseCard(card)) {
-    return `Reverse Holo ${card.rarity}`;
+    return `${card.rarity} Reverse Holo`;
   }
 
   if (isRadiantCard(card)) {
@@ -275,6 +276,10 @@ export function getCollectionDisplayRarity(card) {
     return "Rare Holo";
   }
 
+  if (card.pulledAs === "Holo" && card.rarity === "Rare") {
+    return "Rare Holo";
+  }
+
   return card.rarity;
 }
 
@@ -300,7 +305,9 @@ export function getRarityIcon(card) {
 
 export function getTcgplayerSearchUrl(card, selectedSet) {
   const isReverse = card.pulledAs === "Reverse Holo";
-  const isFoil = !["Common", "Uncommon", "Rare"].includes(card.rarity);
+  const isFoil =
+    card.pulledAs === "Holo" ||
+    !["Common", "Uncommon", "Rare"].includes(card.rarity);
 
   const parts = [card.name, selectedSet.name];
 

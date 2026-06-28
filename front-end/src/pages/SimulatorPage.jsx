@@ -66,9 +66,9 @@ const ERA_PACK_RULES = {
       hyper: 1,
     },
     slot10Weights: {
-      Rare: 80,
+      Rare: 82,
       "Double Rare": 14,
-      "Ultra Rare": 6,
+      "Ultra Rare": 4,
     },
   },
 };
@@ -543,7 +543,7 @@ function openPack(setData) {
     (card) =>
       (
         card.rarity === "Rare" &&
-        card.variants?.normal === true
+        card.variants?.holo === true
       ) ||
       isDoubleRare(card) ||
       card.rarity === "Ultra Rare"
@@ -626,7 +626,7 @@ function openPack(setData) {
     usedIds
   );
 
-  let slot10PulledAs = "Normal";
+  let slot10PulledAs = "Holo";
 
   if (slot10CardBase?.rarity === "Double Rare") {
     slot10PulledAs = "Double Rare";
@@ -648,12 +648,20 @@ function openPack(setData) {
 }
 
 function getCollectedVariantKey(card) {
-  const finish =
-    card.pulledAs === "Reverse Holo"
-      ? "reverse"
-      : card.pulledAs === "Holo"
-      ? "holo"
-      : "normal";
+  let finish = "normal";
+
+  if (card.pulledAs === "Reverse Holo") {
+    finish = "reverse";
+  } else if (
+    card.pulledAs === "Holo" ||
+    card.pulledAs === "Double Rare" ||
+    card.pulledAs === "Ultra Rare" ||
+    card.pulledAs === "Slot 9 Special" ||
+    card.pulledAs === "Amazing Rare" ||
+    card.pulledAs === "Baby Shiny"
+  ) {
+    finish = "holo";
+  }
 
   return `${card.id}|${finish}`;
 }
